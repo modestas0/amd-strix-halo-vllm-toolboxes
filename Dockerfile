@@ -70,7 +70,11 @@ ENV CXX="/opt/rocm/llvm/bin/clang++"
 
 RUN export HIP_DEVICE_LIB_PATH=$(find /opt/rocm -type d -name bitcode -print -quit) && \
   echo "Compiling with Bitcode: $HIP_DEVICE_LIB_PATH" && \
-  export CMAKE_ARGS="-DROCM_PATH=/opt/rocm -DHIP_PATH=/opt/rocm -DAMDGPU_TARGETS=gfx1151 -DHIP_ARCHITECTURES=gfx1151 -DCMAKE_CXX_FLAGS='-mllvm --amdgpu-unroll-threshold-local=600' -DCMAKE_HIP_FLAGS='-mllvm --amdgpu-unroll-threshold-local=600'" && \   
+  export CXXFLAGS="-mllvm --amdgpu-unroll-threshold-local=600" && \
+  export CFLAGS="-mllvm --amdgpu-unroll-threshold-local=600" && \
+  export HIPFLAGS="-mllvm --amdgpu-unroll-threshold-local=600" && \
+  export HIPCXXFLAGS="-mllvm --amdgpu-unroll-threshold-local=600" && \
+  export CMAKE_ARGS="-DROCM_PATH=/opt/rocm -DHIP_PATH=/opt/rocm -DAMDGPU_TARGETS=gfx1151 -DHIP_ARCHITECTURES=gfx1151" && \   
   python -m pip wheel --no-build-isolation --no-deps -w /tmp/dist -v . && \
   python -m pip install /tmp/dist/*.whl
 
