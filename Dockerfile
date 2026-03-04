@@ -41,8 +41,14 @@ RUN git clone https://github.com/ROCm/flash-attention.git &&\
   python setup.py install && \
   cd /opt && rm -rf /opt/flash-attention
 
-# 6. Clone vLLM
-RUN git clone https://github.com/vllm-project/vllm.git /opt/vllm
+# 6. Clone vLLM (Pinned to known-good snapshot date to avoid upstream drift)
+ARG VLLM_REF_DATE="2026-02-26T12:36:03Z"
+RUN git clone https://github.com/vllm-project/vllm.git /opt/vllm && \
+  cd /opt/vllm && \
+  VLLM_COMMIT="$(git rev-list -1 --before="${VLLM_REF_DATE}" origin/main)" && \
+  echo "Using vLLM commit: ${VLLM_COMMIT} (before ${VLLM_REF_DATE})" && \
+  test -n "${VLLM_COMMIT}" && \
+  git checkout "${VLLM_COMMIT}"
 WORKDIR /opt/vllm
 
 # --- PATCHING ---
